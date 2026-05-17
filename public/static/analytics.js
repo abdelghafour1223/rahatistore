@@ -28,11 +28,13 @@
     return 'desktop';
   }
 
+  const HARDCODED_WEBHOOK = 'https://script.google.com/macros/s/AKfycbz3oXPI42RwpYRmNX9leQq6t0ex-I4eWyOUp9v3gQJv7Sa0E-2Nb4qyLJqf2tfIIPnzeA/exec';
+
   function getWebhookUrl() {
     try {
-      return localStorage.getItem(STORAGE_KEY) || '';
+      return localStorage.getItem(STORAGE_KEY) || HARDCODED_WEBHOOK;
     } catch (e) {
-      return '';
+      return HARDCODED_WEBHOOK;
     }
   }
 
