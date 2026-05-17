@@ -582,6 +582,24 @@
         setTimeout(function () { document.getElementById('fullName').focus(); }, 500);
       });
 
+      // ===== Fixed Order Button Visibility =====
+      const fixedBtn = document.getElementById('fixedOrderBtn');
+      const orderForm = document.getElementById('orderForm');
+
+      if (fixedBtn && orderForm) {
+        const observer = new IntersectionObserver((entries) => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting) {
+              fixedBtn.classList.add('is-hidden');
+            } else {
+              fixedBtn.classList.remove('is-hidden');
+            }
+          });
+        }, { threshold: 0 });
+
+        observer.observe(orderForm);
+      }
+
     })();
   </script>
 </body>
