@@ -113,13 +113,13 @@
     if (!url) return false;
     try {
       const data = JSON.stringify(payload);
-      // استخدام fetch مع keepalive لضمان وصول الطلب حتى عند مغادرة الصفحة
+      // استخدام no-cors لتجنب مشاكل Preflight مع Google Apps Script
       fetch(url, {
         method: 'POST',
         body: data,
         headers: { 'Content-Type': 'text/plain;charset=UTF-8' },
         keepalive: true,
-        mode: 'cors'
+        mode: 'no-cors'
       }).catch(function () {});
       return true;
     } catch (e) {
