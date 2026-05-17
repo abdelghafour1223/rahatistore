@@ -113,21 +113,15 @@
     if (!url) return false;
     try {
       const data = JSON.stringify(payload);
-      // إرسال عبر Beacon - يعمل حتى عند مغادرة الصفحة
-      if (navigator.sendBeacon) {
-        const blob = new Blob([data], { type: 'text/plain;charset=UTF-8' });
-        return navigator.sendBeacon(url, blob);
-      } else {
-        // احتياطي للمتصفحات القديمة
-        fetch(url, {
-          method: 'POST',
-          body: data,
-          headers: { 'Content-Type': 'text/plain;charset=UTF-8' },
-          keepalive: true,
-          mode: 'no-cors'
-        }).catch(function () {});
-        return true;
-      }
+      // استخدام fetch مع keepalive لضمان وصول الطلب حتى عند مغادرة الصفحة
+      fetch(url, {
+        method: 'POST',
+        body: data,
+        headers: { 'Content-Type': 'text/plain;charset=UTF-8' },
+        keepalive: true,
+        mode: 'cors'
+      }).catch(function () {});
+      return true;
     } catch (e) {
       return false;
     }
