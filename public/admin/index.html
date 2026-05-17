@@ -1,0 +1,1326 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#E91E63" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>لوحة الإدارة | راحتي</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&family=JetBrains+Mono&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="/static/styles.css" />
+
+  <style>
+    /* ===== أنماط خاصة بلوحة الإدارة ===== */
+
+    body {
+      background: linear-gradient(180deg, #FCE4EC 0%, #FFF9FB 300px);
+      min-height: 100vh;
+    }
+
+    /* شاشة تسجيل الدخول */
+    .login-screen {
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: var(--space-4);
+    }
+
+    .login-card {
+      width: 100%;
+      max-width: 420px;
+      background: var(--color-surface);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-xl);
+      padding: var(--space-8) var(--space-6);
+      text-align: center;
+    }
+
+    .login-card__icon {
+      width: 72px;
+      height: 72px;
+      background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark));
+      border-radius: var(--radius-lg);
+      display: grid;
+      place-items: center;
+      margin: 0 auto var(--space-4);
+      color: #fff;
+      font-size: 36px;
+      box-shadow: var(--shadow-lg);
+    }
+
+    .login-card__title {
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--color-text);
+      margin-bottom: var(--space-2);
+    }
+
+    .login-card__subtitle {
+      color: var(--color-text-muted);
+      font-size: 14px;
+      margin-bottom: var(--space-6);
+    }
+
+    .login-error {
+      background: var(--color-error-bg);
+      color: var(--color-error);
+      padding: var(--space-3);
+      border-radius: var(--radius-md);
+      margin-top: var(--space-3);
+      font-size: 14px;
+      font-weight: 600;
+      display: none;
+    }
+
+    .login-error.is-visible { display: block; }
+
+    /* تطبيق الإدارة */
+    .admin-app { display: none; }
+    .admin-app.is-active { display: block; }
+
+    .admin-header {
+      background: linear-gradient(135deg, var(--color-primary-dark), var(--color-primary));
+      color: #fff;
+      padding: var(--space-5) 0;
+      box-shadow: var(--shadow-md);
+    }
+
+    .admin-header__inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: var(--space-3);
+    }
+
+    .admin-header__title {
+      font-size: 20px;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+    }
+
+    .admin-header__actions {
+      display: flex;
+      gap: var(--space-2);
+    }
+
+    .btn {
+      padding: 10px 18px;
+      border-radius: var(--radius-md);
+      font-weight: 700;
+      font-size: 14px;
+      transition: var(--transition-fast);
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-2);
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark));
+      color: #fff;
+      box-shadow: var(--shadow-md);
+    }
+    .btn-primary:hover { transform: translateY(-1px); box-shadow: var(--shadow-lg); }
+
+    .btn-secondary {
+      background: var(--color-surface);
+      color: var(--color-text);
+      border: 2px solid var(--color-border);
+    }
+    .btn-secondary:hover { border-color: var(--color-primary); color: var(--color-primary-dark); }
+
+    .btn-ghost {
+      background: rgba(255,255,255,0.15);
+      color: #fff;
+      border: 1px solid rgba(255,255,255,0.25);
+    }
+    .btn-ghost:hover { background: rgba(255,255,255,0.25); }
+
+    /* تبويبات */
+    .tabs {
+      display: flex;
+      gap: var(--space-1);
+      background: var(--color-surface);
+      padding: 6px;
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-sm);
+      margin: var(--space-6) 0;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+    .tabs::-webkit-scrollbar { display: none; }
+
+    .tab {
+      flex: 1;
+      min-width: max-content;
+      padding: 12px 18px;
+      border-radius: var(--radius-sm);
+      font-weight: 700;
+      font-size: 14px;
+      color: var(--color-text-soft);
+      transition: var(--transition-fast);
+      white-space: nowrap;
+    }
+
+    .tab.is-active {
+      background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark));
+      color: #fff;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .tab-panel { display: none; }
+    .tab-panel.is-active { display: block; }
+
+    /* بطاقات الإدارة */
+    .admin-card {
+      background: var(--color-surface);
+      border-radius: var(--radius-lg);
+      padding: var(--space-6);
+      box-shadow: var(--shadow-sm);
+      margin-bottom: var(--space-5);
+      border: 1px solid var(--color-border);
+    }
+
+    .admin-card__head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: var(--space-4);
+      flex-wrap: wrap;
+      gap: var(--space-3);
+    }
+
+    .admin-card__title {
+      font-size: 18px;
+      font-weight: 800;
+      color: var(--color-text);
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+    }
+
+    .admin-card__desc {
+      color: var(--color-text-soft);
+      font-size: 14px;
+      margin-bottom: var(--space-4);
+      line-height: 1.7;
+    }
+
+    /* صندوق الكود */
+    .code-box {
+      position: relative;
+      background: #1F2937;
+      color: #F3F4F6;
+      border-radius: var(--radius-md);
+      padding: var(--space-4);
+      font-family: 'JetBrains Mono', Consolas, monospace;
+      font-size: 13px;
+      line-height: 1.7;
+      max-height: 400px;
+      overflow-y: auto;
+      direction: ltr;
+      text-align: left;
+      white-space: pre;
+      tab-size: 2;
+    }
+
+    .code-box code {
+      font-family: inherit;
+      display: block;
+    }
+
+    .code-copy-btn {
+      position: absolute;
+      top: var(--space-3);
+      left: var(--space-3);
+      background: rgba(255,255,255,0.1);
+      color: #fff;
+      border: 1px solid rgba(255,255,255,0.2);
+      padding: 6px 12px;
+      border-radius: var(--radius-sm);
+      font-size: 12px;
+      font-weight: 700;
+      font-family: var(--font-arabic);
+    }
+    .code-copy-btn:hover { background: rgba(255,255,255,0.2); }
+
+    /* خطوات النشر */
+    .steps {
+      display: grid;
+      gap: var(--space-3);
+      margin-top: var(--space-4);
+    }
+
+    .step {
+      display: flex;
+      gap: var(--space-3);
+      padding: var(--space-4);
+      background: var(--color-surface-2);
+      border-radius: var(--radius-md);
+      border-right: 3px solid var(--color-primary);
+    }
+
+    .step__num {
+      flex-shrink: 0;
+      width: 32px;
+      height: 32px;
+      background: var(--color-primary);
+      color: #fff;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      font-weight: 800;
+      font-size: 14px;
+    }
+
+    .step__content {
+      font-size: 14px;
+      color: var(--color-text);
+      line-height: 1.7;
+    }
+
+    .step__content strong { color: var(--color-primary-dark); }
+
+    .step__content code {
+      background: var(--color-surface);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      color: var(--color-primary-dark);
+      direction: ltr;
+      display: inline-block;
+    }
+
+    /* حقل Webhook */
+    .webhook-row {
+      display: flex;
+      gap: var(--space-2);
+      flex-wrap: wrap;
+    }
+
+    .webhook-row .form-input {
+      flex: 1;
+      min-width: 250px;
+      direction: ltr;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+    }
+
+    .test-result {
+      margin-top: var(--space-4);
+      padding: var(--space-4);
+      border-radius: var(--radius-md);
+      font-weight: 600;
+      display: none;
+      animation: slideDown 300ms ease;
+    }
+
+    @keyframes slideDown {
+      from { opacity: 0; transform: translateY(-8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .test-result.is-visible { display: block; }
+
+    .test-result--success {
+      background: var(--color-success-bg);
+      color: var(--color-success);
+      border-right: 4px solid var(--color-success);
+    }
+
+    .test-result--error {
+      background: var(--color-error-bg);
+      color: var(--color-error);
+      border-right: 4px solid var(--color-error);
+    }
+
+    .test-result__title {
+      font-weight: 800;
+      margin-bottom: var(--space-1);
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+    }
+
+    .test-result__detail {
+      font-size: 13px;
+      opacity: 0.9;
+    }
+
+    /* بطاقات الإحصاء */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: var(--space-4);
+      margin-bottom: var(--space-5);
+    }
+
+    .stat-card {
+      background: var(--color-surface);
+      border-radius: var(--radius-lg);
+      padding: var(--space-5);
+      box-shadow: var(--shadow-sm);
+      border: 1px solid var(--color-border);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .stat-card::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 4px;
+      height: 100%;
+      background: linear-gradient(180deg, var(--color-primary), var(--color-primary-dark));
+    }
+
+    .stat-card__label {
+      font-size: 13px;
+      color: var(--color-text-muted);
+      font-weight: 600;
+      margin-bottom: var(--space-2);
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+    }
+
+    .stat-card__value {
+      font-size: 30px;
+      font-weight: 800;
+      color: var(--color-text);
+      line-height: 1;
+    }
+
+    .stat-card__hint {
+      margin-top: var(--space-2);
+      font-size: 12px;
+      color: var(--color-text-muted);
+    }
+
+    /* جدول التحليلات */
+    .data-table-wrap {
+      overflow-x: auto;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--color-border);
+    }
+
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+      background: var(--color-surface);
+    }
+
+    .data-table th,
+    .data-table td {
+      padding: 12px 14px;
+      text-align: right;
+      border-bottom: 1px solid var(--color-border);
+    }
+
+    .data-table th {
+      background: var(--color-surface-2);
+      font-weight: 700;
+      color: var(--color-text);
+      position: sticky;
+      top: 0;
+    }
+
+    .data-table tr:hover { background: var(--color-surface-2); }
+
+    .pill {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: var(--radius-full);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .pill--mobile { background: #DBEAFE; color: #1E40AF; }
+    .pill--desktop { background: #E0E7FF; color: #3730A3; }
+    .pill--tablet { background: #FEF3C7; color: #92400E; }
+
+    /* رسم بياني بسيط بـ CSS */
+    .bar-chart {
+      display: flex;
+      align-items: flex-end;
+      gap: var(--space-2);
+      height: 200px;
+      padding: var(--space-3) 0;
+      border-bottom: 1px solid var(--color-border);
+    }
+
+    .bar-chart__bar {
+      flex: 1;
+      background: linear-gradient(180deg, var(--color-primary), var(--color-primary-dark));
+      border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+      min-height: 4px;
+      position: relative;
+      transition: var(--transition-base);
+    }
+
+    .bar-chart__bar:hover {
+      opacity: 0.85;
+    }
+
+    .bar-chart__bar::after {
+      content: attr(data-value);
+      position: absolute;
+      top: -22px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--color-text);
+    }
+
+    .bar-chart__labels {
+      display: flex;
+      gap: var(--space-2);
+      margin-top: var(--space-2);
+    }
+
+    .bar-chart__label {
+      flex: 1;
+      text-align: center;
+      font-size: 11px;
+      color: var(--color-text-muted);
+    }
+
+    /* حالة فارغة */
+    .empty-state {
+      text-align: center;
+      padding: var(--space-12) var(--space-4);
+      color: var(--color-text-muted);
+    }
+
+    .empty-state__icon {
+      font-size: 48px;
+      margin-bottom: var(--space-3);
+      opacity: 0.5;
+    }
+
+    .empty-state__title {
+      font-weight: 800;
+      color: var(--color-text-soft);
+      margin-bottom: var(--space-2);
+      font-size: 16px;
+    }
+
+    .empty-state__text {
+      font-size: 14px;
+      max-width: 400px;
+      margin: 0 auto;
+    }
+
+    /* تنبيه */
+    .alert {
+      padding: var(--space-4);
+      border-radius: var(--radius-md);
+      margin-bottom: var(--space-4);
+      font-size: 14px;
+      line-height: 1.7;
+      display: flex;
+      gap: var(--space-3);
+    }
+
+    .alert--info {
+      background: #DBEAFE;
+      color: #1E40AF;
+      border-right: 4px solid #3B82F6;
+    }
+
+    .alert__icon { font-size: 22px; flex-shrink: 0; }
+
+  </style>
+</head>
+<body>
+
+  <!-- شاشة تسجيل الدخول -->
+  <div class="login-screen" id="loginScreen">
+    <div class="login-card">
+      <div class="login-card__icon" aria-hidden="true">🔐</div>
+      <h1 class="login-card__title">لوحة الإدارة</h1>
+      <p class="login-card__subtitle">يرجى إدخال كلمة السر للمتابعة</p>
+
+      <form id="loginForm" autocomplete="off">
+        <div class="form-group">
+          <label for="password" class="sr-only">كلمة السر</label>
+          <input
+            type="password"
+            id="password"
+            class="form-input"
+            placeholder="كلمة السر"
+            autocomplete="current-password"
+            autofocus
+            required
+            aria-required="true"
+          />
+        </div>
+        <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center; padding: 14px;">
+          تسجيل الدخول
+        </button>
+        <div class="login-error" id="loginError" role="alert">كلمة السر غير صحيحة، حاولي مرة أخرى</div>
+      </form>
+
+      <p style="margin-top: var(--space-5); font-size: 12px; color: var(--color-text-muted);">
+        💡 كلمة السر الافتراضية: <code style="background: var(--color-surface-2); padding: 2px 6px; border-radius: 4px;">admin2026</code>
+      </p>
+    </div>
+  </div>
+
+  <!-- تطبيق الإدارة -->
+  <div class="admin-app" id="adminApp">
+
+    <header class="admin-header">
+      <div class="container admin-header__inner">
+        <div class="admin-header__title">
+          <span aria-hidden="true">⚙️</span>
+          <span>لوحة إدارة راحتي</span>
+        </div>
+        <div class="admin-header__actions">
+          <a href="/" class="btn btn-ghost">← العودة للمتجر</a>
+          <button class="btn btn-ghost" id="btnLogout">تسجيل الخروج</button>
+        </div>
+      </div>
+    </header>
+
+    <div class="container" style="padding-top: var(--space-6); padding-bottom: var(--space-12);">
+
+      <!-- التبويبات -->
+      <div class="tabs" role="tablist">
+        <button class="tab is-active" role="tab" data-tab="setup" aria-selected="true">
+          📜 إعداد Apps Script
+        </button>
+        <button class="tab" role="tab" data-tab="webhook" aria-selected="false">
+          🔗 رابط الـ Webhook
+        </button>
+        <button class="tab" role="tab" data-tab="analytics" aria-selected="false">
+          📊 لوحة التحليلات
+        </button>
+      </div>
+
+      <!-- ============== تبويب 1: إعداد Apps Script ============== -->
+      <div class="tab-panel is-active" id="panel-setup" role="tabpanel">
+
+        <div class="alert alert--info">
+          <span class="alert__icon" aria-hidden="true">💡</span>
+          <div>
+            <strong>كيف يعمل النظام؟</strong> هذا السكريبت يربط متجرك بـ Google Sheets، حيث يستقبل الطلبات والتحليلات تلقائياً ويحفظها في ورقتين منفصلتين: "الطلبات" و "التحليلات".
+          </div>
+        </div>
+
+        <div class="admin-card">
+          <div class="admin-card__head">
+            <h2 class="admin-card__title">
+              <span aria-hidden="true">📋</span>
+              السكريبت الجاهز (انسخيه كاملاً)
+            </h2>
+            <button class="btn btn-primary" id="btnCopyScript">
+              <span aria-hidden="true">📋</span>
+              نسخ السكريبت
+            </button>
+          </div>
+          <p class="admin-card__desc">
+            هذا السكريبت يستقبل البيانات من المتجر ويحفظها في ورقتين: "الطلبات" لطلبات العملاء، و"التحليلات" لبيانات الزيارات والجلسات.
+          </p>
+
+          <div class="code-box" id="scriptCode"><code id="scriptContent"></code></div>
+        </div>
+
+        <div class="admin-card">
+          <div class="admin-card__head">
+            <h2 class="admin-card__title">
+              <span aria-hidden="true">🚀</span>
+              خطوات النشر (اتبعيها بالترتيب)
+            </h2>
+          </div>
+
+          <div class="steps">
+            <div class="step">
+              <div class="step__num">1</div>
+              <div class="step__content">
+                افتحي <strong>Google Sheets</strong> جديد عبر <code>sheets.new</code>، وسمّيه مثلاً "متجر راحتي - الطلبات".
+              </div>
+            </div>
+
+            <div class="step">
+              <div class="step__num">2</div>
+              <div class="step__content">
+                من القائمة العلوية اضغطي على <strong>Extensions ← Apps Script</strong> (الإضافات ← Apps Script).
+                <br>سيُفتح محرر السكريبت في تبويب جديد.
+              </div>
+            </div>
+
+            <div class="step">
+              <div class="step__num">3</div>
+              <div class="step__content">
+                <strong>امسحي</strong> الكود الافتراضي <code>function myFunction()...</code> ثم <strong>الصقي</strong> السكريبت الذي نسختِه أعلاه. احفظي بالضغط على أيقونة 💾 أو <code>Ctrl + S</code>.
+              </div>
+            </div>
+
+            <div class="step">
+              <div class="step__num">4</div>
+              <div class="step__content">
+                اضغطي على زر <strong>Deploy ← New deployment</strong> (نشر ← نشر جديد).
+              </div>
+            </div>
+
+            <div class="step">
+              <div class="step__num">5</div>
+              <div class="step__content">
+                اضغطي على أيقونة الترس ⚙️ بجانب "Select type" واختاري <strong>Web app</strong> (تطبيق ويب).
+              </div>
+            </div>
+
+            <div class="step">
+              <div class="step__num">6</div>
+              <div class="step__content">
+                في النموذج اختاري:
+                <br>• <strong>Description</strong>: "متجر راحتي"
+                <br>• <strong>Execute as</strong>: <code>Me</code>
+                <br>• <strong>Who has access</strong>: <code>Anyone</code> (مهم جداً!)
+                <br>ثم اضغطي <strong>Deploy</strong>.
+              </div>
+            </div>
+
+            <div class="step">
+              <div class="step__num">7</div>
+              <div class="step__content">
+                اضغطي على <strong>Authorize access</strong>، اختاري حسابك في جوجل، ثم في صفحة التحذير اضغطي على <strong>Advanced</strong> ← <strong>Go to ... (unsafe)</strong> ← <strong>Allow</strong>.
+                <br><em>(هذا التحذير طبيعي لأن السكريبت من تطويرك الشخصي)</em>
+              </div>
+            </div>
+
+            <div class="step">
+              <div class="step__num">8</div>
+              <div class="step__content">
+                ستظهر نافذة بها <strong>Web app URL</strong> ينتهي بـ <code>/exec</code>. <strong>انسخي هذا الرابط</strong> والصقيه في تبويب "رابط الـ Webhook" في الأعلى.
+              </div>
+            </div>
+
+            <div class="step">
+              <div class="step__num">9</div>
+              <div class="step__content">
+                <strong>تم!</strong> اضغطي زر "اختبار الاتصال" للتأكد من نجاح الربط. ستجدين الورقتين قد أُنشئتا تلقائياً في ملف Sheets الخاص بكِ.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ============== تبويب 2: Webhook ============== -->
+      <div class="tab-panel" id="panel-webhook" role="tabpanel">
+
+        <div class="admin-card">
+          <div class="admin-card__head">
+            <h2 class="admin-card__title">
+              <span aria-hidden="true">🔗</span>
+              رابط الـ Webhook
+            </h2>
+          </div>
+          <p class="admin-card__desc">
+            الصقي رابط Apps Script هنا. سيُحفظ تلقائياً في المتصفح وسيُستخدم في كل صفحات الموقع لإرسال الطلبات والتحليلات.
+          </p>
+
+          <div class="form-group">
+            <label for="webhookUrl" class="form-label">رابط Webhook (ينتهي بـ /exec)</label>
+            <div class="webhook-row">
+              <input
+                type="url"
+                id="webhookUrl"
+                class="form-input"
+                placeholder="https://script.google.com/macros/s/.../exec"
+                autocomplete="off"
+                spellcheck="false"
+              />
+            </div>
+          </div>
+
+          <div style="display: flex; gap: var(--space-2); flex-wrap: wrap; margin-top: var(--space-4);">
+            <button class="btn btn-primary" id="btnSaveWebhook">
+              <span aria-hidden="true">💾</span>
+              حفظ الرابط
+            </button>
+            <button class="btn btn-secondary" id="btnTestWebhook">
+              <span aria-hidden="true">🧪</span>
+              اختبار الاتصال
+            </button>
+            <button class="btn btn-secondary" id="btnClearWebhook">
+              <span aria-hidden="true">🗑️</span>
+              مسح
+            </button>
+          </div>
+
+          <div class="test-result" id="testResult" role="status"></div>
+        </div>
+
+        <div class="alert alert--info">
+          <span class="alert__icon" aria-hidden="true">🔒</span>
+          <div>
+            <strong>ملاحظة:</strong> الرابط يُحفظ في <code>localStorage</code> الخاص بمتصفحك فقط، ولا يُرسل لأي خادم خارجي. لكل جهاز إعداده الخاص.
+          </div>
+        </div>
+      </div>
+
+      <!-- ============== تبويب 3: لوحة التحليلات ============== -->
+      <div class="tab-panel" id="panel-analytics" role="tabpanel">
+
+        <div class="admin-card">
+          <div class="admin-card__head">
+            <h2 class="admin-card__title">
+              <span aria-hidden="true">📊</span>
+              تحليلات هذا الجهاز (محلية)
+            </h2>
+            <button class="btn btn-secondary" id="btnResetStats">
+              <span aria-hidden="true">🔄</span>
+              إعادة تعيين
+            </button>
+          </div>
+          <p class="admin-card__desc">
+            هذه التحليلات تُحفظ محلياً في متصفحك من جلسات التصفح التي تمت من هذا الجهاز. للحصول على البيانات الكاملة من جميع الزوار، افتحي ورقة "التحليلات" في Google Sheets.
+          </p>
+
+          <div class="stats-grid" id="statsGrid">
+            <div class="stat-card">
+              <div class="stat-card__label">👥 إجمالي الزيارات</div>
+              <div class="stat-card__value" id="statVisits">0</div>
+              <div class="stat-card__hint">عدد المرات التي فُتح فيها الموقع</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-card__label">⏱️ متوسط مدة الجلسة</div>
+              <div class="stat-card__value" id="statDuration">0<span style="font-size: 14px;">ث</span></div>
+              <div class="stat-card__hint">المتوسط بالثواني</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-card__label">📜 متوسط نسبة التمرير</div>
+              <div class="stat-card__value" id="statScroll">0<span style="font-size: 14px;">%</span></div>
+              <div class="stat-card__hint">كم نزل المستخدم في الصفحة</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-card__label">🛒 الطلبات المُرسلة</div>
+              <div class="stat-card__value" id="statOrders">0</div>
+              <div class="stat-card__hint">من هذا الجهاز</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="admin-card">
+          <div class="admin-card__head">
+            <h2 class="admin-card__title">
+              <span aria-hidden="true">📱</span>
+              توزيع الأجهزة
+            </h2>
+          </div>
+
+          <div id="deviceChart">
+            <div class="bar-chart" id="barChart">
+              <div class="bar-chart__bar" data-value="0%" style="height: 4px;"></div>
+              <div class="bar-chart__bar" data-value="0%" style="height: 4px;"></div>
+              <div class="bar-chart__bar" data-value="0%" style="height: 4px;"></div>
+            </div>
+            <div class="bar-chart__labels">
+              <div class="bar-chart__label">📱 جوال</div>
+              <div class="bar-chart__label">💻 ديسكتوب</div>
+              <div class="bar-chart__label">📲 تابلت</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="admin-card">
+          <div class="admin-card__head">
+            <h2 class="admin-card__title">
+              <span aria-hidden="true">📋</span>
+              آخر الجلسات (محلية)
+            </h2>
+          </div>
+
+          <div class="data-table-wrap">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>التاريخ</th>
+                  <th>الصفحة</th>
+                  <th>الجهاز</th>
+                  <th>المدة</th>
+                  <th>التمرير</th>
+                </tr>
+              </thead>
+              <tbody id="sessionsTable">
+                <!-- يُملأ ديناميكياً -->
+              </tbody>
+            </table>
+          </div>
+
+          <div class="empty-state" id="sessionsEmpty">
+            <div class="empty-state__icon">📊</div>
+            <div class="empty-state__title">لا توجد بيانات بعد</div>
+            <div class="empty-state__text">
+              ستظهر هنا الجلسات المسجلة بعد زيارة الموقع. افتحي الصفحة الرئيسية في تبويب جديد لاختبار التتبع.
+            </div>
+          </div>
+        </div>
+
+        <div class="alert alert--info">
+          <span class="alert__icon" aria-hidden="true">📈</span>
+          <div>
+            <strong>للحصول على التحليلات الكاملة من جميع الزوار:</strong> افتحي ملف Google Sheets المرتبط بسكريبتك، وستجدين ورقة "التحليلات" تحتوي على كل الجلسات والتمرير ونوع الجهاز ومدة كل جلسة.
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast" role="alert" aria-live="assertive"></div>
+
+  <script>
+    /* ==========================================================================
+       منطق لوحة الإدارة
+       ========================================================================== */
+    (function () {
+      'use strict';
+
+      // ===== كلمة السر =====
+      const ADMIN_PASSWORD = 'admin2026';
+      const AUTH_KEY = 'mw_admin_auth';
+      const WEBHOOK_KEY = 'mw_webhook_url';
+      const STATS_KEY = 'mw_local_stats';
+
+      // ===== Toast =====
+      const toast = document.getElementById('toast');
+      function showToast(msg, type) {
+        toast.textContent = msg;
+        toast.className = 'toast is-visible' + (type ? ' toast--' + type : '');
+        setTimeout(function () { toast.classList.remove('is-visible'); }, 3000);
+      }
+
+      // ===== شاشة تسجيل الدخول =====
+      const loginScreen = document.getElementById('loginScreen');
+      const adminApp = document.getElementById('adminApp');
+      const loginForm = document.getElementById('loginForm');
+      const loginError = document.getElementById('loginError');
+
+      function isAuthed() {
+        try {
+          const data = JSON.parse(sessionStorage.getItem(AUTH_KEY) || '{}');
+          // الجلسة صالحة لمدة 4 ساعات
+          return data.ok && (Date.now() - data.time) < (4 * 60 * 60 * 1000);
+        } catch (e) { return false; }
+      }
+
+      function showAdmin() {
+        loginScreen.style.display = 'none';
+        adminApp.classList.add('is-active');
+        initAdmin();
+      }
+
+      if (isAuthed()) {
+        showAdmin();
+      }
+
+      loginForm.addEventListener('submit', function (e) {
+        e.preventDefault();
+        const pwd = document.getElementById('password').value;
+        if (pwd === ADMIN_PASSWORD) {
+          sessionStorage.setItem(AUTH_KEY, JSON.stringify({ ok: true, time: Date.now() }));
+          loginError.classList.remove('is-visible');
+          showAdmin();
+        } else {
+          loginError.classList.add('is-visible');
+          document.getElementById('password').value = '';
+          document.getElementById('password').focus();
+        }
+      });
+
+      // ===== تهيئة لوحة الإدارة =====
+      function initAdmin() {
+        initTabs();
+        initLogout();
+        initScriptCopy();
+        initWebhook();
+        initAnalyticsDashboard();
+        captureCurrentSession();
+      }
+
+      // ===== التبويبات =====
+      function initTabs() {
+        const tabs = document.querySelectorAll('.tab');
+        const panels = document.querySelectorAll('.tab-panel');
+
+        tabs.forEach(function (tab) {
+          tab.addEventListener('click', function () {
+            const target = tab.dataset.tab;
+            tabs.forEach(function (t) {
+              t.classList.remove('is-active');
+              t.setAttribute('aria-selected', 'false');
+            });
+            tab.classList.add('is-active');
+            tab.setAttribute('aria-selected', 'true');
+            panels.forEach(function (p) {
+              p.classList.toggle('is-active', p.id === 'panel-' + target);
+            });
+          });
+        });
+      }
+
+      // ===== تسجيل الخروج =====
+      function initLogout() {
+        document.getElementById('btnLogout').addEventListener('click', function () {
+          sessionStorage.removeItem(AUTH_KEY);
+          location.reload();
+        });
+      }
+
+      // ===== Google Apps Script =====
+      const APPS_SCRIPT_CODE = `/**
+ * متجر راحتي - Google Apps Script Webhook
+ * يستقبل البيانات من المتجر ويحفظها في ورقتين:
+ * - "الطلبات" : طلبات العملاء
+ * - "التحليلات" : بيانات الزيارات والتمرير ومدة الجلسات
+ */
+
+function doPost(e) {
+  try {
+    var data = JSON.parse(e.postData.contents);
+    var ss = SpreadsheetApp.getActiveSpreadsheet();
+
+    if (data.type === 'order') {
+      saveOrder(ss, data);
+    } else if (data.type === 'analytics') {
+      saveAnalytics(ss, data);
+    }
+
+    return ContentService
+      .createTextOutput(JSON.stringify({ ok: true, type: data.type }))
+      .setMimeType(ContentService.MimeType.JSON);
+  } catch (err) {
+    return ContentService
+      .createTextOutput(JSON.stringify({ ok: false, error: err.toString() }))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+}
+
+function doGet(e) {
+  // اختبار الاتصال
+  return ContentService
+    .createTextOutput(JSON.stringify({
+      ok: true,
+      message: 'الاتصال ناجح! السكريبت يعمل.',
+      time: new Date().toISOString()
+    }))
+    .setMimeType(ContentService.MimeType.JSON);
+}
+
+function saveOrder(ss, data) {
+  var sheet = ss.getSheetByName('الطلبات');
+  if (!sheet) {
+    sheet = ss.insertSheet('الطلبات');
+    sheet.appendRow([
+      'التاريخ', 'الاسم الكامل', 'الهاتف', 'العنوان',
+      'المنتج', 'الكمية', 'سعر الوحدة', 'الإجمالي',
+      'الجهاز', 'معرّف الجلسة', 'الصفحة'
+    ]);
+    sheet.getRange(1, 1, 1, 11)
+      .setFontWeight('bold')
+      .setBackground('#E91E63')
+      .setFontColor('#FFFFFF');
+    sheet.setFrozenRows(1);
+  }
+  sheet.appendRow([
+    new Date(),
+    data.fullName || '',
+    data.phone || '',
+    data.address || '',
+    data.product || '',
+    data.quantity || 1,
+    data.unitPrice || 0,
+    data.total || 0,
+    data.device || '',
+    data.sessionId || '',
+    data.page || ''
+  ]);
+}
+
+function saveAnalytics(ss, data) {
+  var sheet = ss.getSheetByName('التحليلات');
+  if (!sheet) {
+    sheet = ss.insertSheet('التحليلات');
+    sheet.appendRow([
+      'التاريخ', 'الحدث', 'معرّف الجلسة', 'الصفحة',
+      'الجهاز', 'مدة الجلسة (ث)', 'نسبة التمرير %',
+      'عرض الشاشة', 'المصدر', 'اللغة', 'User Agent'
+    ]);
+    sheet.getRange(1, 1, 1, 11)
+      .setFontWeight('bold')
+      .setBackground('#1F2937')
+      .setFontColor('#FFFFFF');
+    sheet.setFrozenRows(1);
+  }
+  sheet.appendRow([
+    new Date(),
+    data.event || 'pageview',
+    data.sessionId || '',
+    data.page || '',
+    data.device || '',
+    data.sessionDurationSec || 0,
+    data.scrollDepth || 0,
+    data.screenWidth || 0,
+    data.referrer || 'direct',
+    data.language || '',
+    data.userAgent || ''
+  ]);
+}
+`;
+
+      function initScriptCopy() {
+        document.getElementById('scriptContent').textContent = APPS_SCRIPT_CODE;
+
+        document.getElementById('btnCopyScript').addEventListener('click', function () {
+          copyToClipboard(APPS_SCRIPT_CODE).then(function (ok) {
+            showToast(ok ? '✓ تم نسخ السكريبت بنجاح' : '✗ فشل النسخ', ok ? 'success' : 'error');
+          });
+        });
+      }
+
+      function copyToClipboard(text) {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          return navigator.clipboard.writeText(text).then(function () { return true; }).catch(function () { return fallbackCopy(text); });
+        }
+        return Promise.resolve(fallbackCopy(text));
+      }
+
+      function fallbackCopy(text) {
+        try {
+          const ta = document.createElement('textarea');
+          ta.value = text;
+          ta.style.position = 'fixed';
+          ta.style.opacity = '0';
+          document.body.appendChild(ta);
+          ta.select();
+          const ok = document.execCommand('copy');
+          document.body.removeChild(ta);
+          return ok;
+        } catch (e) { return false; }
+      }
+
+      // ===== Webhook =====
+      function initWebhook() {
+        const input = document.getElementById('webhookUrl');
+        const saved = localStorage.getItem(WEBHOOK_KEY) || '';
+        input.value = saved;
+
+        document.getElementById('btnSaveWebhook').addEventListener('click', function () {
+          const url = input.value.trim();
+          if (!url) {
+            showToast('يرجى إدخال رابط Webhook', 'error');
+            return;
+          }
+          if (!/^https:\/\/script\.google\.com\/.+\/exec$/.test(url)) {
+            if (!confirm('الرابط لا يبدو رابط Apps Script صحيحاً (يجب أن ينتهي بـ /exec). هل تريدين الحفظ على أي حال؟')) {
+              return;
+            }
+          }
+          localStorage.setItem(WEBHOOK_KEY, url);
+          showToast('✓ تم حفظ الرابط بنجاح', 'success');
+        });
+
+        document.getElementById('btnClearWebhook').addEventListener('click', function () {
+          if (!confirm('هل تريدين فعلاً مسح رابط Webhook؟ سيتوقف التتبع.')) return;
+          localStorage.removeItem(WEBHOOK_KEY);
+          input.value = '';
+          showToast('تم مسح الرابط', 'success');
+        });
+
+        document.getElementById('btnTestWebhook').addEventListener('click', testWebhook);
+      }
+
+      async function testWebhook() {
+        const result = document.getElementById('testResult');
+        const url = document.getElementById('webhookUrl').value.trim();
+
+        if (!url) {
+          showTestResult(false, 'الرابط فارغ', 'يرجى إدخال رابط Webhook أولاً.');
+          return;
+        }
+
+        showTestResult(null, '⏳ جاري الاختبار...', 'يتم الآن الاتصال بـ Apps Script، انتظري لحظة.');
+
+        // الطريقة 1: GET للحصول على رد فوري (يتطلب أن الـ Apps Script يدعم doGet)
+        try {
+          const startTime = Date.now();
+          const response = await fetch(url, { method: 'GET', redirect: 'follow' });
+          const elapsed = Date.now() - startTime;
+          const text = await response.text();
+
+          if (response.ok) {
+            let parsed;
+            try { parsed = JSON.parse(text); } catch (e) { parsed = null; }
+
+            if (parsed && parsed.ok) {
+              showTestResult(true,
+                '✓ نجح الاتصال!',
+                'الرد من Apps Script وصل خلال ' + elapsed + 'ms. الرسالة: "' + (parsed.message || 'OK') + '". الـ Webhook جاهز للاستخدام.'
+              );
+              // إرسال POST تجريبي
+              sendTestPost(url);
+            } else {
+              showTestResult(true,
+                '✓ الاتصال يعمل',
+                'تم الوصول للسكريبت (' + elapsed + 'ms) لكن الرد غير متوقع. تأكدي أن الكود مطابق للسكريبت المُعطى.'
+              );
+            }
+          } else {
+            showTestResult(false,
+              '✗ فشل الاتصال (HTTP ' + response.status + ')',
+              'لم يصل الطلب للسكريبت. تأكدي من نشر التطبيق بصلاحية "Anyone" وأن الرابط ينتهي بـ /exec.'
+            );
+          }
+        } catch (err) {
+          // عند حدوث CORS error أو شبكة، نحاول الإرسال عبر beacon كتأكيد
+          showTestResult(false,
+            '✗ خطأ في الشبكة',
+            'لم يستطع المتصفح الوصول إلى Webhook. الأسباب المحتملة:\n• الرابط غير صحيح\n• Apps Script غير منشور كـ Web App\n• صلاحية الوصول ليست "Anyone"\n\nرسالة الخطأ: ' + err.message
+          );
+        }
+      }
+
+      function sendTestPost(url) {
+        // إرسال POST تجريبي عبر Beacon
+        try {
+          const payload = {
+            type: 'analytics',
+            event: 'webhook_test',
+            sessionId: 'test_' + Date.now(),
+            page: '/admin',
+            device: 'admin',
+            sessionDurationSec: 0,
+            scrollDepth: 0
+          };
+          const blob = new Blob([JSON.stringify(payload)], { type: 'text/plain;charset=UTF-8' });
+          if (navigator.sendBeacon) {
+            navigator.sendBeacon(url, blob);
+          }
+        } catch (e) {}
+      }
+
+      function showTestResult(success, title, detail) {
+        const result = document.getElementById('testResult');
+        result.className = 'test-result is-visible';
+        if (success === true) result.classList.add('test-result--success');
+        else if (success === false) result.classList.add('test-result--error');
+        result.innerHTML = '<div class="test-result__title">' + escapeHtml(title) + '</div>' +
+                          '<div class="test-result__detail">' + escapeHtml(detail).replace(/\n/g, '<br>') + '</div>';
+      }
+
+      function escapeHtml(s) {
+        return String(s).replace(/[&<>"']/g, function (c) {
+          return { '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c];
+        });
+      }
+
+      // ===== لوحة التحليلات المحلية =====
+      function getLocalStats() {
+        try {
+          return JSON.parse(localStorage.getItem(STATS_KEY) || '{}');
+        } catch (e) { return {}; }
+      }
+
+      function saveLocalStats(stats) {
+        try { localStorage.setItem(STATS_KEY, JSON.stringify(stats)); } catch (e) {}
+      }
+
+      function captureCurrentSession() {
+        // تسجيل زيارة لـ /admin أيضاً
+        const stats = getLocalStats();
+        stats.visits = (stats.visits || 0) + 1;
+        stats.lastVisit = new Date().toISOString();
+        saveLocalStats(stats);
+      }
+
+      function initAnalyticsDashboard() {
+        const stats = getLocalStats();
+        const sessions = stats.sessions || [];
+        const orders = stats.orders || 0;
+
+        document.getElementById('statVisits').textContent = stats.visits || 0;
+        document.getElementById('statOrders').textContent = orders;
+
+        // متوسط المدة
+        const durations = sessions.map(function (s) { return s.duration || 0; });
+        const avgDur = durations.length ? Math.round(durations.reduce(function (a,b) { return a+b; }, 0) / durations.length) : 0;
+        document.getElementById('statDuration').innerHTML = avgDur + '<span style="font-size: 14px;">ث</span>';
+
+        // متوسط التمرير
+        const scrolls = sessions.map(function (s) { return s.scroll || 0; });
+        const avgScroll = scrolls.length ? Math.round(scrolls.reduce(function (a,b) { return a+b; }, 0) / scrolls.length) : 0;
+        document.getElementById('statScroll').innerHTML = avgScroll + '<span style="font-size: 14px;">%</span>';
+
+        // توزيع الأجهزة
+        const devices = { mobile: 0, desktop: 0, tablet: 0 };
+        sessions.forEach(function (s) {
+          if (devices[s.device] !== undefined) devices[s.device]++;
+        });
+        const totalSessions = devices.mobile + devices.desktop + devices.tablet;
+        const bars = document.querySelectorAll('.bar-chart__bar');
+        const order = ['mobile', 'desktop', 'tablet'];
+        bars.forEach(function (bar, i) {
+          const count = devices[order[i]];
+          const percent = totalSessions ? Math.round((count / totalSessions) * 100) : 0;
+          const height = totalSessions ? Math.max(4, (percent / 100) * 180) : 4;
+          bar.style.height = height + 'px';
+          bar.dataset.value = percent + '%';
+        });
+
+        // جدول الجلسات
+        const tableBody = document.getElementById('sessionsTable');
+        const emptyState = document.getElementById('sessionsEmpty');
+
+        if (sessions.length === 0) {
+          tableBody.parentElement.parentElement.style.display = 'none';
+          emptyState.style.display = 'block';
+        } else {
+          tableBody.parentElement.parentElement.style.display = 'block';
+          emptyState.style.display = 'none';
+
+          // عرض آخر 20 جلسة بترتيب عكسي
+          const recent = sessions.slice(-20).reverse();
+          tableBody.innerHTML = recent.map(function (s) {
+            const date = new Date(s.time);
+            const dateStr = date.toLocaleString('ar-MA', {
+              year: 'numeric', month: '2-digit', day: '2-digit',
+              hour: '2-digit', minute: '2-digit'
+            });
+            const deviceLabel = { mobile: 'جوال', desktop: 'ديسكتوب', tablet: 'تابلت' }[s.device] || s.device;
+            return '<tr>' +
+              '<td>' + escapeHtml(dateStr) + '</td>' +
+              '<td>' + escapeHtml(s.page || '/') + '</td>' +
+              '<td><span class="pill pill--' + s.device + '">' + escapeHtml(deviceLabel) + '</span></td>' +
+              '<td>' + (s.duration || 0) + 'ث</td>' +
+              '<td>' + (s.scroll || 0) + '%</td>' +
+              '</tr>';
+          }).join('');
+        }
+
+        // زر إعادة التعيين
+        document.getElementById('btnResetStats').addEventListener('click', function () {
+          if (!confirm('هل تريدين فعلاً مسح كل الإحصائيات المحلية؟')) return;
+          localStorage.removeItem(STATS_KEY);
+          showToast('تم مسح الإحصائيات', 'success');
+          setTimeout(function () { location.reload(); }, 800);
+        });
+      }
+
+    })();
+  </script>
+</body>
+</html>
