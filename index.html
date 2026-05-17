@@ -379,6 +379,9 @@
   <!-- Toast -->
   <div class="toast" id="toast" role="alert" aria-live="assertive"></div>
 
+  <!-- Configuration -->
+  <script src="/config.js"></script>
+
   <!-- Analytics -->
   <script src="/static/analytics.js"></script>
 
@@ -538,8 +541,27 @@
         };
 
         // إرسال الطلب عبر Analytics (نفس الـ webhook)
+        console.log('[Order] Submitting order...', orderData);
+        
         if (window.MWAnalytics) {
           window.MWAnalytics.track('order_submit', orderData);
+        } else {
+          // Fallback: direct fetch if analytics.js failed to load
+          console.warn('[Order] MWAnalytics not available, using direct fetch');
+          const webhookUrl = (window.MW_CONFIG && window.MW_CONFIG.webhookUrl) || '';
+          if (webhookUrl) {
+            fetch(webhookUrl, {
+              method: 'POST',
+              body: JSON.stringify(orderData),
+              headers: { 'Content-Type': 'text/plain;charset=UTF-8' },
+              keepalive: true,
+              mode: 'no-cors'
+            }).then(function() {
+              console.log('[Order] Direct fetch sent successfully');
+            }).catch(function(err) {
+              console.error('[Order] Direct fetch failed:', err);
+            });
+          }
         }
 
         // الانتقال لصفحة الشكر بعد لحظة قصيرة لإتاحة الإرسال

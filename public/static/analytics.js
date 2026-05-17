@@ -28,13 +28,20 @@
     return 'desktop';
   }
 
-  const HARDCODED_WEBHOOK = 'https://script.google.com/macros/s/AKfycbz3oXPI42RwpYRmNX9leQq6t0ex-I4eWyOUp9v3gQJv7Sa0E-2Nb4qyLJqf2tfIIPnzeA/exec';
-
   function getWebhookUrl() {
     try {
-      return localStorage.getItem(STORAGE_KEY) || HARDCODED_WEBHOOK;
+      // Priority: localStorage override > config file > empty
+      const local = localStorage.getItem(STORAGE_KEY);
+      if (local) return local;
+      
+      // Fallback to config file if available
+      if (window.MW_CONFIG && window.MW_CONFIG.webhookUrl) {
+        return window.MW_CONFIG.webhookUrl;
+      }
+      
+      return '';
     } catch (e) {
-      return HARDCODED_WEBHOOK;
+      return '';
     }
   }
 
@@ -112,9 +119,14 @@
 
   function sendBeacon(payload) {
     const url = getWebhookUrl();
-    if (!url) return false;
+    if (!url) {
+      console.warn('[MWAnalytics] No webhook URL configured');
+      return false;
+    }
     try {
       const data = JSON.stringify(payload);
+      console.log('[MWAnalytics] Sending to:', url, 'Type:', payload.type);
+      
       // استخدام no-cors لتجنب مشاكل Preflight مع Google Apps Script
       fetch(url, {
         method: 'POST',
@@ -122,9 +134,14 @@
         headers: { 'Content-Type': 'text/plain;charset=UTF-8' },
         keepalive: true,
         mode: 'no-cors'
-      }).catch(function () {});
+      }).then(function() {
+        console.log('[MWAnalytics] Request sent successfully');
+      }).catch(function(err) {
+        console.error('[MWAnalytics] Request failed:', err);
+      });
       return true;
     } catch (e) {
+      console.error('[MWAnalytics] Error:', e);
       return false;
     }
   }
