@@ -29,11 +29,18 @@
 
   <!-- شريط الترويج العلوي -->
   <div class="topbar" role="banner">
-    <div class="container topbar__inner">
-      <span class="topbar__badge">عرض محدود</span>
-      <span>🚚 توصيل مجاني لجميع المدن المغربية</span>
-      <span>•</span>
-      <span>💵 الدفع عند الاستلام</span>
+    <div class="topbar__badge">عرض محدود</div>
+    <div class="topbar__marquee">
+      <div class="topbar__marquee-inner">
+        <span> توصيل مجاني لجميع المدن المغربية</span>
+        <span class="topbar__marquee-sep">•</span>
+        <span>💵 الدفع عند الاستلام</span>
+        <span class="topbar__marquee-sep">•</span>
+        <span> توصيل مجاني لجميع المدن المغربية</span>
+        <span class="topbar__marquee-sep">•</span>
+        <span> الدفع عند الاستلام</span>
+        <span class="topbar__marquee-sep">•</span>
+      </div>
     </div>
   </div>
 
@@ -248,62 +255,11 @@
     <!-- مزايا المنتج -->
     <section class="section section--alt" aria-labelledby="features-title">
       <div class="container">
-        <div class="section__header">
-          <h2 class="section__title" id="features-title">مزايا الحزام المميزة</h2>
-          <p class="section__subtitle">
-            صُمّم خصيصاً لتخفيف آلام الدورة الشهرية وآلام البطن بطريقة طبيعية وآمنة
-          </p>
-        </div>
-
-        <div class="features-grid">
-          <article class="feature-card">
-            <div class="feature-card__icon" aria-hidden="true">🔥</div>
-            <h3 class="feature-card__title">حرارة فورية ومريحة</h3>
-            <p class="feature-card__text">
-              تصل للحرارة المناسبة في 3 ثوانٍ فقط لتخفيف آلام وتشنجات البطن بسرعة، مع 4 مستويات تناسب راحتك.
-            </p>
-          </article>
-
-          <article class="feature-card">
-            <div class="feature-card__icon" aria-hidden="true">💆‍♀️</div>
-            <h3 class="feature-card__title">تدليك ينسيك الألم</h3>
-            <p class="feature-card__text">
-              5 مستويات اهتزاز تحاكي التدليك اليدوي، ترخي العضلات وتنشط الدورة الدموية براحة تامة.
-            </p>
-          </article>
-
-          <article class="feature-card">
-            <div class="feature-card__icon" aria-hidden="true">🔋</div>
-            <h3 class="feature-card__title">حرية تامة في الاستخدام</h3>
-            <p class="feature-card__text">
-              لاسلكي مع بطارية تدوم طويلاً، يمكنك التحرك به بحرية تامة في المنزل أو خارجه دون أي قيود.
-            </p>
-          </article>
-
-          <article class="feature-card">
-            <div class="feature-card__icon" aria-hidden="true">👗</div>
-            <h3 class="feature-card__title">غير مرئي تحت الملابس</h3>
-            <p class="feature-card__text">
-              تصميم خفيف جداً ومريح، يمكنك ارتداؤه تحت ملابسك في العمل أو الجامعة دون أن يلاحظه أحد.
-            </p>
-          </article>
-
-          <article class="feature-card">
-            <div class="feature-card__icon" aria-hidden="true">☁️</div>
-            <h3 class="feature-card__title">ناعم ولطيف على البشرة</h3>
-            <p class="feature-card__text">
-              مصنوع من قماش ناعم لا يسبب الحساسية، مع حزام مطاطي قابل للتعديل ليناسب جميع المقاسات.
-            </p>
-          </article>
-
-          <article class="feature-card">
-            <div class="feature-card__icon" aria-hidden="true">🎁</div>
-            <h3 class="feature-card__title">الهدية المثالية</h3>
-            <p class="feature-card__text">
-              يصلك في علبة فاخرة وأنيقة، ليكون أفضل هدية تهتمين بها بنفسك، أو تقدمينها لمن تحبين.
-            </p>
-          </article>
-        </div>
+        <img
+          src="/images/features.png"
+          alt="مزايا الحزام المميزة"
+          style="width: 100%; height: auto; display: block; border-radius: var(--radius-lg);"
+        />
       </div>
     </section>
 
@@ -393,14 +349,6 @@
           </p>
         </div>
         <div class="footer__col">
-          <h4>تواصلي معنا</h4>
-          <ul>
-            <li>📞 0600 000 000</li>
-            <li>✉️ contact@rahati.ma</li>
-            <li>📍 الدار البيضاء، المغرب</li>
-          </ul>
-        </div>
-        <div class="footer__col">
           <h4>معلومات</h4>
           <ul>
             <li>الدفع عند الاستلام</li>
@@ -415,6 +363,9 @@
       </div>
     </div>
   </footer>
+
+  <!-- زر اطلب الآن ثابت أسفل الشاشة -->
+  <a href="#orderForm" class="fixed-order-btn" id="fixedOrderBtn">اطلبي الآن 🛒</a>
 
   <!-- Sticky CTA على الجوال -->
   <div class="sticky-cta" id="stickyCta" aria-hidden="true">
