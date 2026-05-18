@@ -490,7 +490,7 @@
       const name = (params.get('name') || '').trim();
       const phone = (params.get('phone') || '').trim();
       const qty = parseInt(params.get('qty'), 10) || 1;
-      const total = parseInt(params.get('total'), 10) || (qty * 299);
+      const total = parseInt(params.get('total'), 10) || (qty * 199); // 199 = PRICE_UNIT
       const city = (params.get('city') || '').trim();
 
       // ===== عرض البيانات =====

@@ -80,7 +80,7 @@
   });
 
   // تحديث الوقت النشط كل ثانية
-  setInterval(tickActiveTime, 1000);
+  const activeTimerInterval = setInterval(tickActiveTime, 1000);
 
   // ===== أحداث التمرير (throttled) =====
   let scrollTimeout;
@@ -170,8 +170,11 @@
     });
   }
 
-  // إرسال "نهاية الجلسة" عند مغادرة الصفحة
-  window.addEventListener('pagehide', sendPageviewEnd);
+  // إرسال "نهاية الجلسة" عند مغادرة الصفحة + إيقاف المؤقت
+  window.addEventListener('pagehide', function () {
+    clearInterval(activeTimerInterval);
+    sendPageviewEnd();
+  });
   window.addEventListener('beforeunload', sendPageviewEnd);
   // احتياطي: إذا اختفت الصفحة (تبديل التبويب لفترة طويلة)
   document.addEventListener('visibilitychange', function () {

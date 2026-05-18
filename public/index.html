@@ -447,12 +447,20 @@
         track.addEventListener('scroll', function () {
           clearTimeout(scrollDebounce);
           scrollDebounce = setTimeout(function () {
-            const slideWidth = track.scrollWidth / dots.length;
-            // في RTL، scrollLeft قد يكون سالباً في بعض المتصفحات
-            const scrollAbs = Math.abs(track.scrollLeft);
-            const index = Math.round(scrollAbs / slideWidth);
+            // استخدام مواضع DOM الفعلية بدلاً من scrollLeft لضمان صحة RTL
+            const slides = track.querySelectorAll('.gallery__slide');
+            let activeIndex = 0;
+            let minDist = Infinity;
+            const trackRect = track.getBoundingClientRect();
+            const trackCenter = trackRect.left + trackRect.width / 2;
+            slides.forEach(function (slide, i) {
+              const slideRect = slide.getBoundingClientRect();
+              const slideCenter = slideRect.left + slideRect.width / 2;
+              const dist = Math.abs(slideCenter - trackCenter);
+              if (dist < minDist) { minDist = dist; activeIndex = i; }
+            });
             dots.forEach(function (d, i) {
-              d.classList.toggle('is-active', i === index);
+              d.classList.toggle('is-active', i === activeIndex);
             });
           }, 80);
         }, { passive: true });
@@ -460,10 +468,11 @@
         dots.forEach(function (dot) {
           dot.addEventListener('click', function () {
             const index = parseInt(dot.dataset.index, 10);
-            const slideWidth = track.scrollWidth / dots.length;
-            // التمرير - مع مراعاة RTL
-            const target = slideWidth * index;
-            track.scrollTo({ left: -target, behavior: 'smooth' });
+            const slides = track.querySelectorAll('.gallery__slide');
+            if (slides[index]) {
+              // scrollIntoView يعمل صحيحاً في كل المتصفحات مع RTL
+              slides[index].scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+            }
           });
         });
       }
@@ -489,11 +498,12 @@
         qtyPlus.disabled = newQty >= 10;
       }
 
+      if (qtyMinus && qtyPlus && qtyValue && qtyInput) {
       qtyMinus.addEventListener('click', function () {
-        updateQty(parseInt(qtyInput.value, 10) - 1);
+        updateQty((parseInt(qtyInput.value, 10) || 1) - 1);
       });
       qtyPlus.addEventListener('click', function () {
-        updateQty(parseInt(qtyInput.value, 10) + 1);
+        updateQty((parseInt(qtyInput.value, 10) || 1) + 1);
       });
       updateQty(1);
 
@@ -586,14 +596,26 @@
           page: window.location.href
         };
 
-        // إرسال الطلب عبر Analytics (نفس الـ webhook)
-        if (window.MWAnalytics) {
-          window.MWAnalytics.track('order_submit', orderData);
-        }
+        // ===== إرسال الطلب عبر Analytics أو مباشرة عبر sendBeacon =====
+        (function () {
+          var webhookUrl = (window.MW_CONFIG && window.MW_CONFIG.webhookUrl)
+            || localStorage.getItem('mw_webhook_url') || '';
+          if (window.MWAnalytics) {
+            window.MWAnalytics.track('order_submit', orderData);
+          } else if (webhookUrl && navigator.sendBeacon) {
+            // fallback إذا لم يُحمَّل analytics.js
+            var blob = new Blob([JSON.stringify(orderData)], { type: 'text/plain;charset=UTF-8' });
+            navigator.sendBeacon(webhookUrl, blob);
+          } else if (webhookUrl) {
+            fetch(webhookUrl, { method: 'POST', body: JSON.stringify(orderData),
+              headers: { 'Content-Type': 'text/plain;charset=UTF-8' },
+              mode: 'no-cors', keepalive: true }).catch(function () {});
+          }
+        })();
 
-        // الانتقال لصفحة الشكر بعد لحظة قصيرة لإتاحة الإرسال
+        // الانتقال لصفحة الشكر — keepalive يضمن إكمال الإرسال بعد التنقل
         setTimeout(function () {
-          const params = new URLSearchParams({
+          var params = new URLSearchParams({
             name: orderData.fullName,
             phone: orderData.phone,
             qty: orderData.quantity,
@@ -601,14 +623,12 @@
             city: orderData.address.split('،')[0] || orderData.address.split(',')[0] || ''
           });
           window.location.href = '/thankyou/?' + params.toString();
-        }, 600);
+        }, 800);
       });
 
       // ===== Sticky CTA =====
       const stickyCta = document.getElementById('stickyCta');
       const stickyCtaBtn = document.getElementById('stickyCtaBtn');
-      const formTop = form.getBoundingClientRect().top + window.scrollY;
-
       function toggleStickyCta() {
         if (window.innerWidth >= 992) {
           stickyCta.classList.remove('is-visible');
@@ -622,7 +642,16 @@
         stickyCta.setAttribute('aria-hidden', shouldShow ? 'false' : 'true');
       }
 
-      window.addEventListener('scroll', toggleStickyCta, { passive: true });
+      // throttle بـ requestAnimationFrame لأداء أفضل
+      var stickyScrollFrame;
+      window.addEventListener('scroll', function () {
+        if (!stickyScrollFrame) {
+          stickyScrollFrame = requestAnimationFrame(function () {
+            toggleStickyCta();
+            stickyScrollFrame = null;
+          });
+        }
+      }, { passive: true });
       window.addEventListener('resize', toggleStickyCta);
       toggleStickyCta();
 
